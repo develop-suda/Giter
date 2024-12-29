@@ -1,0 +1,30 @@
+services:
+  app: # service名
+    container_name: giter
+    build: . # ビルドに使用するDockerfileがあるディレクトリ指定
+    tty: true # コンテナの起動永続化
+    ports:
+      - '8888:8888' # "ホストのポート:コンテナのポート"
+    volumes:
+      - .:/go/src/giter # マウントディレクトリ指定
+    networks:
+      - default
+  postgres:
+    image: postgres:16-alpine
+    container_name: '${POSTGRES_DATABASE}'
+    hostname: ${HOST_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker/postgres/init.d:/docker-entrypoint-initdb.d
+      - ./docker/postgres/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8'
+      POSTGRES_DB: '${POSTGRES_DATABASE}'
+      TZ: 'Asia/Tokyo'
+    restart: always
+
+networks:
+  default:
