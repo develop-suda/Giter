@@ -31,6 +31,9 @@ type RequestController struct {
 }
 
 // GetCommitsメソッドの実装
+// TODO: リポジトリ一覧取得してそれでループ回す
+// TODO: client作るところ別関数にする
+// TODO: log出力させる
 func (c *RequestController) GetCommits(ctx *gin.Context) {
 	repositories, err := c.GetRepositories(ctx)
 	if err != nil {
