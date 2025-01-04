@@ -18,11 +18,14 @@ type RequestService struct {
 }
 
 func (r *RequestService) GetCommits(client *graphql.Client, variables map[string]interface{}) (*query.GitHubQuery, error) {
-	// 実装をここに追加
 	commits, err := r.repository.GetCommits(client, variables)
 	if err != nil {
 		return nil, err
 	}
+
+	// Execute GetCommittedDatesJST
+	commits.UpdateCommittedDatesToJST()
+
 	return commits, nil
 }
 

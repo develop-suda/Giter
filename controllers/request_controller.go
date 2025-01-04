@@ -34,7 +34,6 @@ type RequestController struct {
 // TODO: リポジトリ一覧取得してそれでループ回す
 // TODO: client作るところ別関数にする
 // TODO: log出力させる
-// TODO: 時間をJSTに合わせる
 func (c *RequestController) GetCommits(ctx *gin.Context) {
 	repositories, err := c.GetRepositories(ctx)
 	if err != nil {

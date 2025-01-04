@@ -34,6 +34,7 @@ func (r *RequestRepository) GetCommits(client *graphql.Client, variables map[str
 }
 
 func (r *RequestRepository) GetRepositories(client *github.Client, username string) ([]*github.Repository, error) {
+
 	repos, _, err := client.Repositories.List(context.Background(), username, nil)
 	if err != nil {
 		fmt.Println(client)

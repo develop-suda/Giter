@@ -1,5 +1,7 @@
 package query
 
+import "time"
+
 type GitHubQuery struct {
 	User User `json:"user" graphql:"user(login: $USER_NAME)"`
 }
@@ -41,8 +43,22 @@ type History struct {
 }
 
 type CommitNode struct {
-	Message       string `json:"message"`
-	URL           string `json:"url"`
-	CommittedDate string `json:"committedDate"`
-	Oid           string `json:"oid"`
+	Message       string    `json:"message"`
+	URL           string    `json:"url"`
+	CommittedDate time.Time `json:"committedDate"`
+	Oid           string    `json:"oid"`
+}
+
+func (c *CommitNode) CommittedDateJST() time.Time {
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	return c.CommittedDate.In(jst)
+}
+
+func (q *GitHubQuery) UpdateCommittedDatesToJST() *GitHubQuery {
+	for i, refNode := range q.User.Repository.Refs.Nodes {
+		for j, commitNode := range refNode.Target.Commit.History.Nodes {
+			q.User.Repository.Refs.Nodes[i].Target.Commit.History.Nodes[j].CommittedDate = commitNode.CommittedDateJST()
+		}
+	}
+	return q
 }
