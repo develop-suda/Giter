@@ -26,4 +26,4 @@ go.work.sum
 /docker
 .vscode
 .DS_store
-.tmp
+/tmp
