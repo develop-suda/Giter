@@ -47,6 +47,12 @@ type CommitNode struct {
 	Oid           string `json:"oid"`
 }
 
-type Test struct {
-	Name string `json:"name"`
+type variables struct {
+	USER_NAME       string
+	REPOSITORY_NAME string
 }
+
+// := map[string]interface{}{
+// 	"USER_NAME":       "develop-suda",
+// 	"REPOSITORY_NAME": "Giter",
+// }
