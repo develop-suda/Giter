@@ -3,36 +3,41 @@ package main
 import (
 	"fmt"
 	"giter/di"
-	"log"
+	"giter/infra"
+	"giter/initializer"
+	"giter/middlewares"
 	"net/http"
 
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// アプリケーション設定の初期化
+	initializer.Init()
+	initializer.Log()
+
+	// インフラ設定の初期化
+	infra.Initialize()
 
 	requestController := di.InitializeRouter()
 
 	r := gin.Default()
+
+	// 各リクエストにリクエストIDを生成
+	r.Use(requestid.New())
+	// カスタムロギングミドルウェアを使用
+	r.Use(middlewares.LogMiddleware())
+	// HTMLテンプレートを読み込む
 	r.LoadHTMLGlob("templates/*")
 
-	r.GET("/json", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			// "commits": commitsQuery,
-			// "repositories": repositories,
-		})
-	})
-
+	r.GET("/", requestController.Index)
 	r.GET("/commit", requestController.GetCommits)
 
-	r.GET("/index", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", nil)
+	// 未定義のルートをホームページにリダイレクト
+	r.NoRoute(func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/")
 	})
 
 	fmt.Println("server start")

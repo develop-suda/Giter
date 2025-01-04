@@ -1,17 +1,13 @@
 package initializer
 
 import (
-	"context"
-	"errors"
 	"giter/public"
 	"io"
 	"os"
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/rs/zerolog/pkgerrors"
 )
 
 var RequestID string
@@ -40,7 +36,6 @@ func Log() {
 	// zerologでのログをファイルと標準出力に出力
 	log.Logger = log.Output(io.MultiWriter(zerologf, zerologjsonf))
 
-	// logstudy()
 }
 
 // ログファイルを取得する関数
@@ -72,62 +67,4 @@ func openLogFile(filePath string) (*os.File, error) {
 // リクエストIDを設定する関数
 func SetRequestID(c *gin.Context) {
 	RequestID = requestid.Get(c)
-}
-
-func logstudy() {
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-
-	log.Trace().Send()
-	log.Debug().Send()
-	log.Info().Send()
-	log.Warn().Send()
-	log.Error().Send()
-	// log.Fatal().Send()
-	// log.Panic().Send()
-	log.Info().Send()
-
-	err := outer()
-	// なんかスタックトレースでねえ
-	log.Error().Stack().Err(err).Msg("")
-
-	f()
-
-}
-
-func inner() error {
-	return errors.New("seems we have an error here")
-}
-
-func middle() error {
-	err := inner()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func outer() error {
-	err := middle()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// こいつは使えそうや
-func f() {
-	logger := zerolog.New(os.Stdout)
-	ctx := context.Background()
-
-	// Attach the Logger to the context.Context
-	ctx = logger.WithContext(ctx)
-	someFunc(ctx)
-}
-
-func someFunc(ctx context.Context) {
-	// Get Logger from the go Context. if it's nil, then
-	// `zerolog.DefaultContextLogger` is returned, if
-	// `DefaultContextLogger` is nil, then a disabled logger is returned.
-	logger := zerolog.Ctx(ctx)
-	logger.Info().Msg("Hello")
 }
