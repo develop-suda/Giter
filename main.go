@@ -29,19 +29,28 @@ func main() {
 
 	client := graphql.NewClient("https://api.github.com/graphql", httpClient)
 
-	var query query.GitHubQuery
+	var commitsQuery query.GitHubQuery
+	variables := map[string]interface{}{
+		"USER_NAME":       "develop-suda",
+		"REPOSITORY_NAME": "Giter",
+	}
 
-	err = client.Query(context.Background(), &query, nil)
+	err = client.Query(context.Background(), &commitsQuery, variables)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+
+	var repositories query.WelcomeElement
+	client = graphql.NewClient("https://api.github.com/users/develop-suda/repos", httpClient)
+	err = client.Query(context.Background(), &repositories, nil)
 
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/json", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"commits": query,
+			"commits": commitsQuery,
+			// "repositories": repositories,
 		})
 	})
 

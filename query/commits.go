@@ -1,11 +1,11 @@
 package query
 
 type GitHubQuery struct {
-	User User `json:"user" graphql:"user(login: \"develop-suda\")"`
+	User User `json:"user" graphql:"user(login: $USER_NAME)"`
 }
 
 type User struct {
-	Repository Repository `json:"repository" graphql:"repository(name: \"typ_engineer_API\")"`
+	Repository Repository `json:"repository" graphql:"repository(name: $REPOSITORY_NAME)"`
 }
 
 type Repository struct {
@@ -45,4 +45,8 @@ type CommitNode struct {
 	URL           string `json:"url"`
 	CommittedDate string `json:"committedDate"`
 	Oid           string `json:"oid"`
+}
+
+type Test struct {
+	Name string `json:"name"`
 }
