@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"giter/di"
 	"log"
 	"net/http"
 
@@ -16,6 +17,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	requestController := di.InitializeRouter()
+
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 
@@ -25,6 +28,8 @@ func main() {
 			// "repositories": repositories,
 		})
 	})
+
+	r.GET("/commit", requestController.GetCommits)
 
 	r.GET("/index", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", nil)

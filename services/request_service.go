@@ -4,12 +4,13 @@ import (
 	"giter/query"
 	"giter/repositories"
 
+	"github.com/google/go-github/github"
 	"github.com/hasura/go-graphql-client"
 )
 
 type IRequestService interface {
 	GetCommits(client *graphql.Client, variables map[string]interface{}) (*query.GitHubQuery, error)
-	GetRepositories(client *graphql.Client) (*query.WelcomeElement, error)
+	GetRepositories(client *github.Client, username string) ([]*github.Repository, error)
 }
 
 type RequestService struct {
@@ -25,8 +26,8 @@ func (r *RequestService) GetCommits(client *graphql.Client, variables map[string
 	return commits, nil
 }
 
-func (r *RequestService) GetRepositories(client *graphql.Client) (*query.WelcomeElement, error) {
-	return r.repository.GetRepositories(client)
+func (r *RequestService) GetRepositories(client *github.Client, username string) ([]*github.Repository, error) {
+	return r.repository.GetRepositories(client, username)
 }
 
 // 新しいRequestServiceを作成する関数

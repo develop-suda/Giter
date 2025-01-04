@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"giter/initializer"
-	services "giter/service"
+	"giter/services"
 	"net/http"
 	"os"
 
+	"github.com/google/go-github/github"
 	"github.com/hasura/go-graphql-client"
 	"github.com/rs/zerolog"
 	"golang.org/x/oauth2"
@@ -18,6 +19,7 @@ import (
 // IRequestControllerインターフェースの定義
 type IRequestController interface {
 	GetCommits(ctx *gin.Context)
+	GetRepositories(ctx *gin.Context) ([]*github.Repository, error)
 	Index(ctx *gin.Context)
 	Err(ctx *gin.Context)
 }
@@ -30,19 +32,40 @@ type RequestController struct {
 
 // GetCommitsメソッドの実装
 func (c *RequestController) GetCommits(ctx *gin.Context) {
-	// Implement the logic for GetCommits here
+	repositories, err := c.GetRepositories(ctx)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(repositories)
+
 	src := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: os.Getenv("GRAPHQL_TOKEN")},
 	)
 	httpClient := oauth2.NewClient(context.Background(), src)
-	client := graphql.NewClient("https://api.github.com/users/develop-suda/repos", httpClient)
-	repositories, err := c.service.GetRepositories(client)
+	client := graphql.NewClient("https://api.github.com/graphql", httpClient)
+
+	args := map[string]any{
+		"USER_NAME":       "develop-suda",
+		"REPOSITORY_NAME": "Giter",
+	}
+	commits, err := c.service.GetCommits(client, args)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(repositories)
+	fmt.Println(commits)
 
-	// client := graphql.NewClient("https://api.github.com/graphql", httpClient)
+}
+
+func (c *RequestController) GetRepositories(ctx *gin.Context) ([]*github.Repository, error) {
+	client := github.NewClient(nil)
+	username := "develop-suda"
+
+	repos, err := c.service.GetRepositories(client, username)
+	if err != nil {
+		return nil, err
+	}
+	return repos, nil
 }
 
 // Indexメソッドの実装
