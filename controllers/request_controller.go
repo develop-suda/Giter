@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"giter/initializer"
+	"giter/query"
 	"giter/services"
 	"net/http"
 
@@ -26,9 +27,6 @@ type RequestController struct {
 	logger  zerolog.Logger
 }
 
-// GetCommitsメソッドの実装
-// TODO: リポジトリ一覧取得してそれでループ回す
-// TODO: client作るところ別関数にする
 // TODO: log出力させる
 func (c *RequestController) GetCommits(ctx *gin.Context) {
 	repositories, err := c.GetRepositories(ctx)
@@ -36,21 +34,20 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(repositories)
-	args := map[string]any{
-		"USER_NAME":       "develop-suda",
-		"REPOSITORY_NAME": "Giter",
+	var commits []query.GitHubQuery
+
+	for _, v := range repositories {
+		repo := *v.Name
+		fmt.Println(repo)
+		commit, err := c.service.GetCommits(repo, "develop-suda")
+		commits = append(commits, *commit)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 
-	commits, err := c.service.GetCommits(args)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	fmt.Println(commits)
-	ctx.JSON(http.StatusOK, gin.H{
+	ctx.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"commits": commits,
-		"repos":   repositories,
 	})
 }
 

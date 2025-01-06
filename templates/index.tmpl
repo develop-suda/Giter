@@ -3,10 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/x-icon;,">
-    <title>テンプレート</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>GitHub Commits</title>
 </head>
-<body>
-    <h1>Hello World!</h1>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">GitHub Commits</h1>
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Repository</th>
+                    <th class="py-2 px-4 border-b">Commit Message</th>
+                    <th class="py-2 px-4 border-b">Commit URL</th>
+                    <th class="py-2 px-4 border-b">Committed Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .commits}}
+                    {{range .User.Repository.Refs.Nodes}}
+                        {{range .Target.Commit.History.Nodes}}
+                            <tr>
+                                <td class="py-2 px-4 border-b">{{$.User.Repository.Name}}</td>
+                                <td class="py-2 px-4 border-b">{{.Message}}</td>
+                                <td class="py-2 px-4 border-b"><a href="{{.URL}}" class="text-blue-500">{{.URL}}</a></td>
+                                <td class="py-2 px-4 border-b">{{.CommittedDate}}</td>
+                            </tr>
+                        {{end}}
+                    {{end}}
+                {{end}}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

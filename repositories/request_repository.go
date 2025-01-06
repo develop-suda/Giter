@@ -36,7 +36,9 @@ func (r *RequestRepository) GetCommits(args map[string]interface{}) (*query.GitH
 }
 
 func (r *RequestRepository) GetRepositories(username string) ([]*github.Repository, error) {
-	repos, _, err := r.RESTClient.Repositories.List(context.Background(), username, nil)
+	// オプションをつけないとアルファベット順に取得する
+	opts := &github.RepositoryListOptions{Sort: "pushed", ListOptions: github.ListOptions{PerPage: 100}}
+	repos, _, err := r.RESTClient.Repositories.List(context.Background(), username, opts)
 	if err != nil {
 		return nil, err
 	}

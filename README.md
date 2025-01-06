@@ -36,3 +36,4 @@
 - publicリポジトリのみ
 - 一つのリポジトリに対して⚪︎個ブランチ分の情報を取得する
 - 一個のブランチに対して最新の⚪コミット分の情報を取得する
+- [リポジトリ一覧取得API](https://docs.github.com/ja/rest/repos/repos?apiVersion=2022-11-28#list-repositories-for-a-user)
