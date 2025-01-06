@@ -10,12 +10,14 @@ import (
 	"giter/controllers"
 	"giter/repositories"
 	"giter/services"
+	"github.com/google/go-github/github"
+	"github.com/hasura/go-graphql-client"
 )
 
 // Injectors from wire.go:
 
-func InitializeRouter() controllers.IRequestController {
-	iRequestRepository := repositories.NewRequestRepository()
+func InitializeRouter(RESTClient *github.Client, GraphQL *graphql.Client) controllers.IRequestController {
+	iRequestRepository := repositories.NewRequestRepository(RESTClient, GraphQL)
 	iRequestService := services.NewRequestService(iRequestRepository)
 	iRequestController := controllers.NewRequestController(iRequestService)
 	return iRequestController

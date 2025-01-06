@@ -21,7 +21,8 @@ func main() {
 	// インフラ設定の初期化
 	infra.Initialize()
 
-	requestController := di.InitializeRouter()
+	clients := initializer.NewClients()
+	requestController := di.InitializeRouter(clients.RClient, clients.GClient)
 
 	r := gin.Default()
 

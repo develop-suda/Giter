@@ -1,17 +1,13 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"giter/initializer"
 	"giter/services"
 	"net/http"
-	"os"
 
 	"github.com/google/go-github/github"
-	"github.com/hasura/go-graphql-client"
 	"github.com/rs/zerolog"
-	"golang.org/x/oauth2"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,21 +37,16 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 	}
 
 	fmt.Println(repositories)
-
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GRAPHQL_TOKEN")},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-	client := graphql.NewClient("https://api.github.com/graphql", httpClient)
-
 	args := map[string]any{
 		"USER_NAME":       "develop-suda",
 		"REPOSITORY_NAME": "Giter",
 	}
-	commits, err := c.service.GetCommits(client, args)
+
+	commits, err := c.service.GetCommits(args)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
+
 	fmt.Println(commits)
 	ctx.JSON(http.StatusOK, gin.H{
 		"commits": commits,
@@ -64,10 +55,10 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 }
 
 func (c *RequestController) GetRepositories(ctx *gin.Context) ([]*github.Repository, error) {
-	client := github.NewClient(nil)
+
 	username := "develop-suda"
 
-	repos, err := c.service.GetRepositories(client, username)
+	repos, err := c.service.GetRepositories(username)
 	if err != nil {
 		return nil, err
 	}

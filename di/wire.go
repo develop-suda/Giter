@@ -20,10 +20,12 @@ package di
 // 	"giter/repositories"
 // 	"giter/services"
 
+// 	"github.com/google/go-github/github"
 // 	"github.com/google/wire"
+// 	"github.com/hasura/go-graphql-client"
 // )
 
-// func InitializeRouter() controllers.IRequestController {
+// func InitializeRouter(RESTClient *github.Client, GraphQL *graphql.Client) controllers.IRequestController {
 // 	wire.Build(controllers.NewRequestController, services.NewRequestService, repositories.NewRequestRepository)
 // 	return &controllers.RequestController{}
 // }
