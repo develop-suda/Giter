@@ -34,7 +34,7 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 		return
 	}
 
-	var commits []query.SCommits
+	var commits []query.SimpleCommits
 
 	for _, v := range repositories {
 		repo := *v.Name

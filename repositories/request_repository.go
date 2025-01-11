@@ -14,7 +14,7 @@ import (
 // IRequestRepository インターフェースの定義
 type IRequestRepository interface {
 	// ポケモンを検索するメソッド
-	GetCommits(args map[string]interface{}) (*query.GitHubQuery, error)
+	GetCommits(args map[string]interface{}) (*query.CommitsQuery, error)
 	GetRepositories(username string) ([]*github.Repository, error)
 }
 
@@ -26,8 +26,8 @@ type RequestRepository struct {
 }
 
 // GetCommits implements IRequestRepository.
-func (r *RequestRepository) GetCommits(args map[string]interface{}) (*query.GitHubQuery, error) {
-	var commitsQuery query.GitHubQuery
+func (r *RequestRepository) GetCommits(args map[string]interface{}) (*query.CommitsQuery, error) {
+	var commitsQuery query.CommitsQuery
 	err := r.GraphQLClient.Query(context.Background(), &commitsQuery, args)
 	if err != nil {
 		fmt.Println(err.Error())

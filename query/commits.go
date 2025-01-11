@@ -2,7 +2,7 @@ package query
 
 import "time"
 
-type GitHubQuery struct {
+type CommitsQuery struct {
 	User User `json:"user" graphql:"user(login: $USER_NAME)"`
 }
 
@@ -54,9 +54,9 @@ func (c *CommitNode) CommittedDateJST() time.Time {
 	return c.CommittedDate.In(jst)
 }
 
-func (q *GitHubQuery) ToSCommits() *SCommits {
+func (q *CommitsQuery) ToSimpleCommits() *SimpleCommits {
 	repo := q.User.Repository
-	sRepo := &SCommits{
+	sRepo := &SimpleCommits{
 		Name:  repo.Name,
 		URL:   repo.URL,
 		Owner: repo.Owner,
