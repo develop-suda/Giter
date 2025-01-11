@@ -1,5 +1,7 @@
 package query
 
+import "time"
+
 type SimpleCommits struct {
 	Name   string   `json:"name"`
 	URL    string   `json:"url"`
@@ -19,6 +21,14 @@ func (r *SimpleCommits) UpdateCommittedDatesToJST() *SimpleCommits {
 		}
 	}
 	return r
+}
+
+type Commits struct {
+	Name          string    `json:"name"`
+	Branch        string    `json:"branch"`
+	Message       string    `json:"message"`
+	URL           string    `json:"url"`
+	CommittedDate time.Time `json:"committedDate"`
 }
 
 // TODO:同一コミットを削除する
@@ -49,4 +59,22 @@ func (c *SimpleCommits) RemoveDuplicateCommits() {
 			c.Branch[i].Nodes = uniqueNodes
 		}
 	}
+}
+
+func ToCommits(commits *[]SimpleCommits) *[]Commits {
+	var result []Commits
+	for _, simpleCommit := range *commits {
+		for _, branch := range simpleCommit.Branch {
+			for _, commitNode := range branch.Nodes {
+				result = append(result, Commits{
+					Name:          simpleCommit.Name,
+					Branch:        branch.Name,
+					Message:       commitNode.Message,
+					URL:           commitNode.URL,
+					CommittedDate: commitNode.CommittedDate,
+				})
+			}
+		}
+	}
+	return &result
 }

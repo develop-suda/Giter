@@ -27,7 +27,6 @@ type RequestController struct {
 	logger  zerolog.Logger
 }
 
-// TODO: log出力させる
 func (c *RequestController) GetCommits(ctx *gin.Context) {
 	repositories, err := c.GetRepositories(ctx)
 	if err != nil {
@@ -46,8 +45,10 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 		}
 	}
 
+	result := query.ToCommits(&commits)
+
 	ctx.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"commits": commits,
+		"commits": result,
 	})
 }
 
