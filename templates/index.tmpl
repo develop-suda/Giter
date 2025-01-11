@@ -19,18 +19,18 @@
                 </tr>
             </thead>
             <tbody>
-                {{range .commits}}
-                    {{range .User.Repository.Refs.Nodes}}
-                        {{range .Target.Commit.History.Nodes}}
+                {{ range .commits }}
+                    {{ range .Branch }}
+                        {{ range .Nodes }}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{$.User.Repository.Name}}</td>
-                                <td class="py-2 px-4 border-b">{{.Message}}</td>
-                                <td class="py-2 px-4 border-b"><a href="{{.URL}}" class="text-blue-500">{{.URL}}</a></td>
-                                <td class="py-2 px-4 border-b">{{.CommittedDate}}</td>
+                                <td class="py-2 px-4 border-b">{{ $.Name }}</td>
+                                <td class="py-2 px-4 border-b">{{ .Message }}</td>
+                                <td class="py-2 px-4 border-b"><a href="{{ .URL }}" class="text-blue-500">{{ .URL }}</a></td>
+                                <td class="py-2 px-4 border-b">{{ .CommittedDate }}</td>
                             </tr>
-                        {{end}}
-                    {{end}}
-                {{end}}
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
             </tbody>
         </table>
     </div>

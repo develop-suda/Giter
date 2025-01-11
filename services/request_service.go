@@ -8,7 +8,7 @@ import (
 )
 
 type IRequestService interface {
-	GetCommits(repoName string, username string) (*query.GitHubQuery, error)
+	GetCommits(repoName string, username string) (*query.SCommits, error)
 	GetRepositories(username string) ([]*github.Repository, error)
 }
 
@@ -16,7 +16,7 @@ type RequestService struct {
 	repository repositories.IRequestRepository
 }
 
-func (r *RequestService) GetCommits(repoName string, username string) (*query.GitHubQuery, error) {
+func (r *RequestService) GetCommits(repoName string, username string) (*query.SCommits, error) {
 	args := map[string]any{
 		"USER_NAME":       username,
 		"REPOSITORY_NAME": repoName,
@@ -26,10 +26,13 @@ func (r *RequestService) GetCommits(repoName string, username string) (*query.Gi
 		return nil, err
 	}
 
-	// Execute GetCommittedDatesJST
-	commits.UpdateCommittedDatesToJST()
+	// Convert commits to SCommits
+	sRepo := commits.ToSCommits()
 
-	return commits, nil
+	// Execute GetCommittedDatesJST
+	sRepo.UpdateCommittedDatesToJST()
+
+	return sRepo, nil
 }
 
 func (r *RequestService) GetRepositories(username string) ([]*github.Repository, error) {

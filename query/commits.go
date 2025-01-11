@@ -54,11 +54,21 @@ func (c *CommitNode) CommittedDateJST() time.Time {
 	return c.CommittedDate.In(jst)
 }
 
-func (q *GitHubQuery) UpdateCommittedDatesToJST() *GitHubQuery {
-	for i, refNode := range q.User.Repository.Refs.Nodes {
-		for j, commitNode := range refNode.Target.Commit.History.Nodes {
-			q.User.Repository.Refs.Nodes[i].Target.Commit.History.Nodes[j].CommittedDate = commitNode.CommittedDateJST()
-		}
+func (q *GitHubQuery) ToSCommits() *SCommits {
+	repo := q.User.Repository
+	sRepo := &SCommits{
+		Name:  repo.Name,
+		URL:   repo.URL,
+		Owner: repo.Owner,
 	}
-	return q
+
+	for _, refNode := range repo.Refs.Nodes {
+		branch := Branch{Name: refNode.Name}
+		for _, commitNode := range refNode.Target.Commit.History.Nodes {
+			branch.Nodes = append(branch.Nodes, commitNode)
+		}
+		sRepo.Branch = append(sRepo.Branch, branch)
+	}
+
+	return sRepo
 }
