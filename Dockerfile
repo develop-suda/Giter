@@ -14,7 +14,7 @@ WORKDIR /go/src/giter
 # ホストのファイルをコンテナの作業ディレクトリに移行
 ADD . /go/src/giter
 
-RUN go mod init
+# RUN go mod init
 RUN apt-get update
 RUN go get github.com/uudashr/gopkgs/v2/cmd/gopkgs
 RUN go get github.com/ramya-rao-a/go-outline
@@ -37,4 +37,4 @@ RUN go get -u github.com/gin-gonic/gin
 
 # Airをインストール
 RUN go install github.com/cosmtrek/air@v1.27.3
-RUN go mod tidy
+# RUN go mod tidy
