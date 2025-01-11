@@ -32,6 +32,8 @@ func (r *RequestService) GetCommits(repoName string, username string) (*query.Si
 	// Execute GetCommittedDatesJST
 	sRepo.UpdateCommittedDatesToJST()
 
+	sRepo.RemoveDuplicateCommits()
+
 	return sRepo, nil
 }
 

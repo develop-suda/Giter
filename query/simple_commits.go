@@ -20,3 +20,33 @@ func (r *SimpleCommits) UpdateCommittedDatesToJST() *SimpleCommits {
 	}
 	return r
 }
+
+// TODO:同一コミットを削除する
+// main,masterブランチを正とする
+// oidで検索をかけ一致したら削除する
+func (c *SimpleCommits) RemoveDuplicateCommits() {
+	primaryBranches := map[string]bool{"main": true, "master": true}
+	commitMap := make(map[string]bool)
+
+	for _, branch := range c.Branch {
+		if primaryBranches[branch.Name] {
+			for _, commitNode := range branch.Nodes {
+				commitMap[commitNode.Oid] = true
+			}
+		}
+	}
+
+	for i, branch := range c.Branch {
+		if !primaryBranches[branch.Name] {
+			var uniqueNodes []CommitNode
+			for _, commitNode := range branch.Nodes {
+				// HACK:こーゆー書き方もある
+				if !commitMap[commitNode.Oid] {
+					uniqueNodes = append(uniqueNodes, commitNode)
+					commitMap[commitNode.Oid] = true
+				}
+			}
+			c.Branch[i].Nodes = uniqueNodes
+		}
+	}
+}
