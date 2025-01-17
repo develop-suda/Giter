@@ -35,9 +35,9 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 
 	var commits []query.SimpleCommits
 
-	for _, v := range repositories {
+	for i, v := range repositories {
 		repo := *v.Name
-		fmt.Println(repo)
+		fmt.Printf("Repository %d: %s\n", i, repo)
 		commit, err := c.service.GetCommits(repo, "develop-suda")
 		commits = append(commits, *commit)
 		if err != nil {
