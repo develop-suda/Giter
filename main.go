@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"giter/controllers"
 	"giter/di"
 	"giter/infra"
 	"giter/initializer"
@@ -20,9 +21,11 @@ func main() {
 
 	// インフラ設定の初期化
 	infra.Initialize()
+	db := infra.SetupDB()
 
 	clients := initializer.NewClients()
 	requestController := di.InitializeRouter(clients.RClient, clients.GClient)
+	authController := controllers.NewAuthController(db)
 
 	r := gin.Default()
 
@@ -35,6 +38,8 @@ func main() {
 
 	r.GET("/", requestController.Index)
 	r.GET("/commit", requestController.GetCommits)
+	r.POST("/register", authController.Register)
+	r.POST("/login", authController.Login)
 
 	// 未定義のルートをホームページにリダイレクト
 	r.NoRoute(func(c *gin.Context) {
