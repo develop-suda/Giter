@@ -11,11 +11,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type RegisterInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 type IAuthControler interface {
 	RegisterUser(c *gin.Context)
 	Login(c *gin.Context)
@@ -28,7 +23,7 @@ type AuthController struct {
 }
 
 func (a *AuthController) RegisterUser(c *gin.Context) {
-	var input RegisterInput
+	var input dto.RegisterInput
 
 	// リクエストのJSONデータをRegisterInput構造体にバインドする
 	if err := c.ShouldBindJSON(&input); err != nil {
