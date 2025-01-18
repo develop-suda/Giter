@@ -1,7 +1,6 @@
 package models
 
 import (
-	"giter/utils/token"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -43,28 +42,4 @@ func (u *User) BeforeSave(*gorm.DB) error {
 func (u *User) PrepareOutput() *User {
 	u.Password = ""
 	return u
-}
-
-func GenerateToken(username string, password string, db *gorm.DB) (string, error) {
-	var user User
-
-	err := db.Where("username = ?", username).First(&user).Error
-
-	if err != nil {
-		return "", err
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-
-	if err != nil {
-		return "", err
-	}
-
-	token, err := token.GenerateToken(user.ID)
-
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
 }

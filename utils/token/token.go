@@ -15,7 +15,7 @@ import (
 func GenerateToken(id uint) (string, error) {
 	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
 	if tokenLifespan == 0 {
-		tokenLifespan = 1 // デフォルト値を24時間に設定
+		tokenLifespan = 1
 	}
 
 	if err != nil {

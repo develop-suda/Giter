@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"giter/dto"
+	"giter/initializer"
 	"giter/models"
-	"giter/utils/token"
+	"giter/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/rs/zerolog"
 )
 
 type RegisterInput struct {
@@ -15,21 +17,17 @@ type RegisterInput struct {
 }
 
 type IAuthControler interface {
-	Register(c *gin.Context)
+	RegisterUser(c *gin.Context)
 	Login(c *gin.Context)
 	CurrentUser(c *gin.Context)
 }
 
 type AuthController struct {
-	db *gorm.DB
+	service services.IAuthService
+	logger  zerolog.Logger
 }
 
-func NewAuthController(db *gorm.DB) IAuthControler {
-	// デフォルトのロガーを使用してPokemonRepositoryを初期化
-	return &AuthController{db: db}
-}
-
-func (a *AuthController) Register(c *gin.Context) {
+func (a *AuthController) RegisterUser(c *gin.Context) {
 	var input RegisterInput
 
 	// リクエストのJSONデータをRegisterInput構造体にバインドする
@@ -40,10 +38,8 @@ func (a *AuthController) Register(c *gin.Context) {
 
 	// ユーザーオブジェクトを作成し、データベースに保存する
 	user := &models.User{Username: input.Username, Password: input.Password}
-	user, err := user.Save(a.db)
+	user, err := a.service.RegisterUser(user)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -51,20 +47,15 @@ func (a *AuthController) Register(c *gin.Context) {
 	})
 }
 
-type LoginInput struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
 func (a *AuthController) Login(c *gin.Context) {
-	var input LoginInput
+	var input dto.LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	token, err := models.GenerateToken(input.Username, input.Password, a.db)
+	token, err := a.service.Login(&input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -77,23 +68,21 @@ func (a *AuthController) Login(c *gin.Context) {
 
 func (a *AuthController) CurrentUser(c *gin.Context) {
 	// トークンからユーザーIDを抽出する
-	userId, err := token.ExtractTokenId(c)
-
+	userID, err := a.service.ExtractTokenId(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
 	var user models.User
-	// ユーザーIDに基づいてユーザー情報をデータベースから取得する
-	err = a.db.First(&user, userId).Error
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		return
-	}
+	err = a.service.CurrentUser(&user, userID)
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": user.PrepareOutput(),
 	})
+}
+
+func NewAuthController(service services.IAuthService) IAuthControler {
+	// デフォルトのロガーを使用してPokemonRepositoryを初期化
+	return &AuthController{service: service, logger: initializer.DefaultLogger()}
 }
