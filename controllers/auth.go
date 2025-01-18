@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"giter/models"
+	"giter/utils/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,7 @@ type RegisterInput struct {
 type IAuthControler interface {
 	Register(c *gin.Context)
 	Login(c *gin.Context)
+	CurrentUser(c *gin.Context)
 }
 
 type AuthController struct {
@@ -70,5 +72,28 @@ func (a *AuthController) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+	})
+}
+
+func (a *AuthController) CurrentUser(c *gin.Context) {
+	// トークンからユーザーIDを抽出する
+	userId, err := token.ExtractTokenId(c)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	// ユーザーIDに基づいてユーザー情報をデータベースから取得する
+	err = a.db.First(&user, userId).Error
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": user.PrepareOutput(),
 	})
 }

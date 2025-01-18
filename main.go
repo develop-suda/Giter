@@ -41,6 +41,12 @@ func main() {
 	r.POST("/register", authController.Register)
 	r.POST("/login", authController.Login)
 
+	protected := r.Group("/admin")
+	// JWT認証ミドルウェアを適用
+	protected.Use(middlewares.JwtAuthMiddleware())
+	// 認証されたユーザー情報を取得するルートを定義
+	protected.GET("/user", authController.CurrentUser)
+
 	// 未定義のルートをホームページにリダイレクト
 	r.NoRoute(func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
