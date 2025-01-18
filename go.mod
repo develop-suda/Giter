@@ -54,6 +54,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/google/wire v0.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/zerolog v1.33.0
 	golang.org/x/oauth2 v0.24.0
