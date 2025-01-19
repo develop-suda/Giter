@@ -46,7 +46,8 @@ func (a *AuthController) RegisterUser(ctx *gin.Context) {
 func (a *AuthController) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 
-	if err := ctx.ShouldBindJSON(&input); err != nil {
+	// フォームデータをバインドする
+	if err := ctx.ShouldBind(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -57,7 +58,10 @@ func (a *AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
+	// ctx.SetCookie("jwt", cookie, 3600, "/", "localhost", false, true)
+	ctx.SetCookie("jwt", token, 3600, "/", "localhost", true, true)
+
+	ctx.HTML(http.StatusOK, "mypage.tmpl", gin.H{
 		"token": token,
 	})
 }
