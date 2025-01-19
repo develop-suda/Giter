@@ -15,6 +15,7 @@ type IAuthControler interface {
 	RegisterUser(c *gin.Context)
 	Login(c *gin.Context)
 	CurrentUser(c *gin.Context)
+	LoginView(c *gin.Context)
 }
 
 type AuthController struct {
@@ -77,7 +78,13 @@ func (a *AuthController) CurrentUser(c *gin.Context) {
 	})
 }
 
+func (a *AuthController) LoginView(c *gin.Context) {
+	// Indexメソッドの実装
+	c.HTML(http.StatusOK, "login.tmpl", nil)
+}
+
 func NewAuthController(service services.IAuthService) IAuthControler {
 	// デフォルトのロガーを使用してPokemonRepositoryを初期化
 	return &AuthController{service: service, logger: initializer.DefaultLogger()}
+
 }

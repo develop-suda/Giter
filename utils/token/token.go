@@ -14,10 +14,6 @@ import (
 // 指定されたユーザーIDに基づいてJWTトークンを生成する
 func GenerateToken(id uint) (string, error) {
 	tokenLifespan, err := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
-	if tokenLifespan == 0 {
-		tokenLifespan = 1
-	}
-
 	if err != nil {
 		return "", err
 	}
@@ -42,6 +38,7 @@ func extractTokenString(c *gin.Context) string {
 }
 
 func parseToken(tokenString string) (*jwt.Token, error) {
+	// トークンの検証、トークンのパースを実行
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("There was an error")

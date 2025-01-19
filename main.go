@@ -38,6 +38,7 @@ func main() {
 	r.GET("/", requestController.Index)
 	r.GET("/commit", requestController.GetCommits)
 	r.POST("/register", authController.RegisterUser)
+	r.GET("/login", authController.LoginView)
 	r.POST("/login", authController.Login)
 
 	protected := r.Group("/admin")
