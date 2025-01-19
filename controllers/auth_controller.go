@@ -12,10 +12,10 @@ import (
 )
 
 type IAuthControler interface {
-	RegisterUser(c *gin.Context)
-	Login(c *gin.Context)
-	CurrentUser(c *gin.Context)
-	LoginView(c *gin.Context)
+	RegisterUser(ctx *gin.Context)
+	Login(ctx *gin.Context)
+	CurrentUser(ctx *gin.Context)
+	LoginView(ctx *gin.Context)
 }
 
 type AuthController struct {
@@ -23,12 +23,12 @@ type AuthController struct {
 	logger  zerolog.Logger
 }
 
-func (a *AuthController) RegisterUser(c *gin.Context) {
+func (a *AuthController) RegisterUser(ctx *gin.Context) {
 	var input dto.RegisterInput
 
 	// リクエストのJSONデータをRegisterInput構造体にバインドする
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -38,49 +38,49 @@ func (a *AuthController) RegisterUser(c *gin.Context) {
 	if err != nil {
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"data": user.PrepareOutput(),
 	})
 }
 
-func (a *AuthController) Login(c *gin.Context) {
+func (a *AuthController) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	token, err := a.service.Login(&input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"token": token,
 	})
 }
 
-func (a *AuthController) CurrentUser(c *gin.Context) {
+func (a *AuthController) CurrentUser(ctx *gin.Context) {
 	// トークンからユーザーIDを抽出する
-	userID, err := a.service.ExtractTokenId(c)
+	userID, err := a.service.ExtractTokenId(ctx)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
 	var user models.User
 	err = a.service.CurrentUser(&user, userID)
 
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"data": user.PrepareOutput(),
 	})
 }
 
-func (a *AuthController) LoginView(c *gin.Context) {
+func (a *AuthController) LoginView(ctx *gin.Context) {
 	// Indexメソッドの実装
-	c.HTML(http.StatusOK, "login.tmpl", nil)
+	ctx.HTML(http.StatusOK, "login.tmpl", nil)
 }
 
 func NewAuthController(service services.IAuthService) IAuthControler {

@@ -9,14 +9,14 @@ import (
 
 // JwtAuthMiddleware はJWT認証を行うミドルウェアを返します
 func JwtAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		err := token.TokenValid(c)
+	return func(ctx *gin.Context) {
+		err := token.TokenValid(ctx)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-			c.Abort()
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			ctx.Abort()
 			return
 		}
 
-		c.Next()
+		ctx.Next()
 	}
 }

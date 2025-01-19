@@ -16,7 +16,7 @@ type IAuthService interface {
 	RegisterUser(user *models.User) (*models.User, error)
 	Login(user *dto.LoginInput) (string, error)
 	CurrentUser(user *models.User, userID uint) error
-	ExtractTokenId(c *gin.Context) (uint, error)
+	ExtractTokenId(ctx *gin.Context) (uint, error)
 }
 
 type AuthService struct {
@@ -55,8 +55,8 @@ func (a *AuthService) CurrentUser(user *models.User, userID uint) error {
 	return a.repository.CurrentUser(user, userID)
 }
 
-func (a *AuthService) ExtractTokenId(c *gin.Context) (uint, error) {
-	return token.ExtractTokenId(c)
+func (a *AuthService) ExtractTokenId(ctx *gin.Context) (uint, error) {
+	return token.ExtractTokenId(ctx)
 }
 
 func NewAuthService(repository repositories.IAuthRepository) IAuthService {

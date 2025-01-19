@@ -48,7 +48,7 @@ func main() {
 	protected.GET("/user", authController.CurrentUser)
 
 	// 未定義のルートをホームページにリダイレクト
-	r.NoRoute(func(c *gin.Context) {
+	r.NoRoute(func(ctx *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
 

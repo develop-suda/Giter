@@ -65,6 +65,6 @@ func openLogFile(filePath string) (*os.File, error) {
 }
 
 // リクエストIDを設定する関数
-func SetRequestID(c *gin.Context) {
-	RequestID = requestid.Get(c)
+func SetRequestID(ctx *gin.Context) {
+	RequestID = requestid.Get(ctx)
 }

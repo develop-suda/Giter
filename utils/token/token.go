@@ -27,8 +27,8 @@ func GenerateToken(id uint) (string, error) {
 	return token.SignedString([]byte(os.Getenv("API_SECRET")))
 }
 
-func extractTokenString(c *gin.Context) string {
-	bearToken := c.Request.Header.Get("Authorization")
+func extractTokenString(ctx *gin.Context) string {
+	bearToken := ctx.Request.Header.Get("Authorization")
 	strArr := strings.Split(bearToken, " ")
 	if len(strArr) == 2 {
 		return strArr[1]
@@ -54,8 +54,8 @@ func parseToken(tokenString string) (*jwt.Token, error) {
 }
 
 // トークンが有効かどうかを検証
-func TokenValid(c *gin.Context) error {
-	tokenString := extractTokenString(c)
+func TokenValid(ctx *gin.Context) error {
+	tokenString := extractTokenString(ctx)
 
 	token, err := parseToken(tokenString)
 
@@ -71,8 +71,8 @@ func TokenValid(c *gin.Context) error {
 }
 
 // トークンからユーザーIDを取得
-func ExtractTokenId(c *gin.Context) (uint, error) {
-	tokenString := extractTokenString(c)
+func ExtractTokenId(ctx *gin.Context) (uint, error) {
+	tokenString := extractTokenString(ctx)
 
 	token, err := parseToken(tokenString)
 
