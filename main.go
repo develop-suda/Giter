@@ -49,7 +49,7 @@ func main() {
 
 	// 未定義のルートをホームページにリダイレクト
 	r.NoRoute(func(ctx *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/")
+		ctx.Redirect(http.StatusMovedPermanently, "/")
 	})
 
 	fmt.Println("server start")
