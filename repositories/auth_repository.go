@@ -10,7 +10,7 @@ import (
 )
 
 type IAuthRepository interface {
-	RegisterUser(user *models.User) (*models.User, error)
+	Register(user *models.User) (*models.User, error)
 	Login(user *dto.LoginInput) (*models.User, error)
 	CurrentUser(user *models.User, userID uint) error
 }
@@ -20,7 +20,7 @@ type AuthRepository struct {
 	logger zerolog.Logger
 }
 
-func (a *AuthRepository) RegisterUser(user *models.User) (*models.User, error) {
+func (a *AuthRepository) Register(user *models.User) (*models.User, error) {
 	user, err := user.Save(a.db)
 	if err != nil {
 		return nil, err

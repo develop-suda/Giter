@@ -5,6 +5,7 @@ import (
 	"giter/initializer"
 	"giter/models"
 	"giter/services"
+	"giter/utils/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,9 +13,10 @@ import (
 )
 
 type IAuthControler interface {
-	RegisterUser(ctx *gin.Context)
+	Register(ctx *gin.Context)
 	Login(ctx *gin.Context)
 	CurrentUser(ctx *gin.Context)
+	SignupView(ctx *gin.Context)
 	LoginView(ctx *gin.Context)
 }
 
@@ -23,23 +25,28 @@ type AuthController struct {
 	logger  zerolog.Logger
 }
 
-func (a *AuthController) RegisterUser(ctx *gin.Context) {
+func (a *AuthController) Register(ctx *gin.Context) {
 	var input dto.RegisterInput
 
-	// リクエストのJSONデータをRegisterInput構造体にバインドする
-	if err := ctx.ShouldBindJSON(&input); err != nil {
+	// リクエストのフォームデータをRegisterInput構造体にバインドする
+	if err := ctx.ShouldBind(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	// ユーザーオブジェクトを作成し、データベースに保存する
 	user := &models.User{Username: input.Username, Password: input.Password}
-	user, err := a.service.RegisterUser(user)
+	user, err := a.service.Register(user)
 	if err != nil {
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": user.PrepareOutput(),
+	token, err := token.GenerateToken(user.ID)
+	if err != nil {
+	}
+
+	ctx.SetCookie("jwt", token, 3600, "/", "localhost", true, true)
+	ctx.HTML(http.StatusOK, "mypage.tmpl", gin.H{
+		"token": token,
 	})
 }
 
@@ -80,6 +87,10 @@ func (a *AuthController) CurrentUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": user.PrepareOutput(),
 	})
+}
+
+func (a *AuthController) SignupView(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "signup.tmpl", nil)
 }
 
 func (a *AuthController) LoginView(ctx *gin.Context) {

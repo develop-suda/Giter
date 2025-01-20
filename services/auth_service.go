@@ -13,7 +13,7 @@ import (
 )
 
 type IAuthService interface {
-	RegisterUser(user *models.User) (*models.User, error)
+	Register(user *models.User) (*models.User, error)
 	Login(user *dto.LoginInput) (string, error)
 	CurrentUser(user *models.User, userID uint) error
 	ExtractTokenId(ctx *gin.Context) (uint, error)
@@ -24,8 +24,8 @@ type AuthService struct {
 	logger     zerolog.Logger
 }
 
-func (a *AuthService) RegisterUser(user *models.User) (*models.User, error) {
-	return a.repository.RegisterUser(user)
+func (a *AuthService) Register(user *models.User) (*models.User, error) {
+	return a.repository.Register(user)
 }
 
 func (a *AuthService) Login(input *dto.LoginInput) (string, error) {
