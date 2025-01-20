@@ -2,7 +2,6 @@ package infra
 
 import (
 	"fmt"
-	"giter/models"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -35,9 +34,6 @@ func SetupDB() *gorm.DB {
 	if err != nil {
 		panic("Failed to connect database")
 	}
-
-	// ここで適切なエンティティに対してマイグレーションを実行します。
-	db.AutoMigrate(&models.User{})
 
 	return db
 }
