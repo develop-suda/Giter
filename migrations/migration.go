@@ -5,7 +5,6 @@ import (
 	"giter/models"
 )
 
-// pokemonsテーブルを削除し再作成後、データ投入
 func main() {
 	infra.Initialize()    // インフラの初期化
 	db := infra.SetupDB() // データベースのセットアップ
