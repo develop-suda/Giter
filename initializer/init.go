@@ -1,6 +1,8 @@
 package initializer
 
-import "time"
+import (
+	"time"
+)
 
 func Init() {
 	// This is the entry point of the application.
