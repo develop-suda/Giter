@@ -7,11 +7,15 @@ services:
       - '8888:8888' # "ホストのポート:コンテナのポート"
     volumes:
       - .:/go/src/giter # マウントディレクトリ指定
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET}
+      GITHUB_KEY: ${GITHUB_KEY}
+      GITHUB_SECRET: ${GITHUB_SECRET}
     networks:
       - default
   postgres:
     image: postgres:16-alpine
-    container_name: '${POSTGRES_DATABASE}'
+    container_name: ${POSTGRES_DATABASE}
     hostname: ${HOST_NAME}
     ports:
       - 5432:5432
@@ -19,10 +23,10 @@ services:
       - ./docker/postgres/init.d:/docker-entrypoint-initdb.d
       - ./docker/postgres/pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: '${POSTGRES_USER}'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_INITDB_ARGS: '--encoding=UTF-8'
-      POSTGRES_DB: '${POSTGRES_DATABASE}'
+      POSTGRES_DB: ${POSTGRES_DATABASE}
       TZ: 'Asia/Tokyo'
     restart: always
 
