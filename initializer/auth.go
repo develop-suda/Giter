@@ -2,6 +2,7 @@ package initializer
 
 import (
 	"giter/auth"
+	"giter/infra"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +29,7 @@ func init() {
 
 	// ①
 	goth.UseProviders(
-		github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), "http://localhost:8080/auth/github/callback"),
+		github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), "http://localhost:3000/auth/github/callback", "user"),
 	)
 }
 
@@ -54,8 +55,12 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, data)
 }
 
-func main() {
+// TODO:pat使ってるけどginでルーティングする
+// TODO:JWTログインと整合性をとる→DB設計、などなど
+// TODO:ファイルの名前、配置なども直す
+func Main() {
 	// ② patを使ってルーティング設定
+	infra.Initialize()
 	p := pat.New()
 	p.Get("/auth/{provider}/callback", auth.CallbackHandler)
 	p.Get("/auth/{provider}", gothic.BeginAuthHandler)
