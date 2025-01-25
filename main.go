@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+	"giter/controllers"
 	"giter/di"
 	"giter/infra"
 	"giter/initializer"
 	"giter/middlewares"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/github"
 )
 
 func main() {
@@ -22,9 +26,14 @@ func main() {
 	infra.Initialize()
 	db := infra.SetupDB()
 
+	goth.UseProviders(
+		github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), "http://localhost:8080/auth/github/callback", "user"),
+	)
+
 	clients := initializer.NewClients()
 	requestController := di.InitCommitRouter(clients.RClient, clients.GClient)
 	authController := di.InitAuthRouter(db)
+	githubAuthController := controllers.NewGitHubAuthController()
 
 	r := gin.Default()
 
@@ -47,6 +56,10 @@ func main() {
 	protected.Use(middlewares.JwtAuthMiddleware())
 	// 認証されたユーザー情報を取得するルートを定義
 	protected.GET("/user", authController.CurrentUser)
+
+	// GitHubログイン
+	r.GET("/auth/github", githubAuthController.GitHubLogin)
+	r.GET("/auth/github/callback", githubAuthController.GitHubCallback)
 
 	// 未定義のルートをホームページにリダイレクト
 	r.NoRoute(func(ctx *gin.Context) {
