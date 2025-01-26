@@ -30,3 +30,10 @@ func InitAuthRouter(db *gorm.DB) controllers.IAuthControler {
 	iAuthControler := controllers.NewAuthController(iAuthService)
 	return iAuthControler
 }
+
+func InitGithubAuthRouter(db *gorm.DB) controllers.IGithubAuthController {
+	iGithubAuthRepository := repositories.NewGithubAuthRepository(db)
+	iGithubAuthService := services.NewGithubAuthService(iGithubAuthRepository)
+	iGithubAuthController := controllers.NewGithubAuthController(iGithubAuthService)
+	return iGithubAuthController
+}

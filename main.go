@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"giter/controllers"
 	"giter/di"
 	"giter/infra"
 	"giter/initializer"
@@ -33,7 +32,7 @@ func main() {
 	clients := initializer.NewClients()
 	requestController := di.InitCommitRouter(clients.RClient, clients.GClient)
 	authController := di.InitAuthRouter(db)
-	githubAuthController := controllers.NewGitHubAuthController()
+	githubAuthController := di.InitGithubAuthRouter(db)
 
 	r := gin.Default()
 
