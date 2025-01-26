@@ -1,16 +1,15 @@
 package models
 
 import (
-	"strings"
-
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Username string `gorm:"size:255;not null;unique" json:"username"`
-	Password string `gorm:"size:255;not null;" json:"password"`
+	Email        string `gorm:"size:255;not null;unique" json:"email"`
+	Password     string `gorm:"size:255;" json:"password"`
+	IsGithubUser bool   `gorm:"not null" json:"is_github_user"`
 }
 
 // User オブジェクトをデータベースに保存する
@@ -31,9 +30,6 @@ func (u *User) BeforeSave(*gorm.DB) error {
 	}
 
 	u.Password = string(hashedPassword)
-
-	// ユーザーネームを小文字に変換する
-	u.Username = strings.ToLower(u.Username)
 
 	return nil
 }

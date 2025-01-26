@@ -15,6 +15,7 @@ import (
 // TODO:signup後のDB登録処理
 // TODO:signupとlogin処理の書き分け
 // TODO:認証後の処理
+// TODO:GitHubログイン後のJWT???
 
 type IGitHubAuthController interface {
 	GitHubLogin(ctx *gin.Context)

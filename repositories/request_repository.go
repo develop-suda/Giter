@@ -15,7 +15,7 @@ import (
 type IRequestRepository interface {
 	// ポケモンを検索するメソッド
 	GetCommits(args map[string]interface{}) (*query.CommitsQuery, error)
-	GetRepositories(username string) ([]*github.Repository, error)
+	GetRepositories(email string) ([]*github.Repository, error)
 }
 
 // RequestRepository 構造体の定義
@@ -35,10 +35,10 @@ func (r *RequestRepository) GetCommits(args map[string]interface{}) (*query.Comm
 	return &commitsQuery, nil
 }
 
-func (r *RequestRepository) GetRepositories(username string) ([]*github.Repository, error) {
+func (r *RequestRepository) GetRepositories(email string) ([]*github.Repository, error) {
 	// オプションをつけないとアルファベット順に取得する
 	opts := &github.RepositoryListOptions{Sort: "pushed", ListOptions: github.ListOptions{PerPage: 100}}
-	repos, _, err := r.RESTClient.Repositories.List(context.Background(), username, opts)
+	repos, _, err := r.RESTClient.Repositories.List(context.Background(), email, opts)
 	if err != nil {
 		return nil, err
 	}

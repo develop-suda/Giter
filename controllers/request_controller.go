@@ -54,9 +54,9 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 
 func (c *RequestController) GetRepositories(ctx *gin.Context) ([]*github.Repository, error) {
 
-	username := "develop-suda"
+	email := "develop-suda"
 
-	repos, err := c.service.GetRepositories(username)
+	repos, err := c.service.GetRepositories(email)
 	if err != nil {
 		return nil, err
 	}

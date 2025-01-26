@@ -32,7 +32,7 @@ func (a *AuthRepository) Register(user *models.User) (*models.User, error) {
 func (a *AuthRepository) Login(input *dto.LoginInput) (*models.User, error) {
 	var user models.User
 
-	err := a.db.Where("username = ?", input.Username).First(&user).Error
+	err := a.db.Where("email = ?", input.Email).First(&user).Error
 	if err != nil {
 		return nil, err
 	}

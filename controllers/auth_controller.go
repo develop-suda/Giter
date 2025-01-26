@@ -35,7 +35,7 @@ func (a *AuthController) Register(ctx *gin.Context) {
 	}
 
 	// ユーザーオブジェクトを作成し、データベースに保存する
-	user := &models.User{Username: input.Username, Password: input.Password}
+	user := &models.User{Email: input.Email, Password: input.Password, IsGithubUser: false}
 	user, err := a.service.Register(user)
 	if err != nil {
 	}

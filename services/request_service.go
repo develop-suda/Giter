@@ -8,17 +8,17 @@ import (
 )
 
 type IRequestService interface {
-	GetCommits(repoName string, username string) (*query.SimpleCommits, error)
-	GetRepositories(username string) ([]*github.Repository, error)
+	GetCommits(repoName string, email string) (*query.SimpleCommits, error)
+	GetRepositories(email string) ([]*github.Repository, error)
 }
 
 type RequestService struct {
 	repository repositories.IRequestRepository
 }
 
-func (r *RequestService) GetCommits(repoName string, username string) (*query.SimpleCommits, error) {
+func (r *RequestService) GetCommits(repoName string, email string) (*query.SimpleCommits, error) {
 	args := map[string]any{
-		"USER_NAME":       username,
+		"USER_NAME":       email,
 		"REPOSITORY_NAME": repoName,
 	}
 	commits, err := r.repository.GetCommits(args)
@@ -37,8 +37,8 @@ func (r *RequestService) GetCommits(repoName string, username string) (*query.Si
 	return sRepo, nil
 }
 
-func (r *RequestService) GetRepositories(username string) ([]*github.Repository, error) {
-	return r.repository.GetRepositories(username)
+func (r *RequestService) GetRepositories(email string) ([]*github.Repository, error) {
+	return r.repository.GetRepositories(email)
 }
 
 // 新しいRequestServiceを作成する関数
