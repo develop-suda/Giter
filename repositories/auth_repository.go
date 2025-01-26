@@ -6,6 +6,7 @@ import (
 	"giter/models"
 
 	"github.com/rs/zerolog"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +22,14 @@ type AuthRepository struct {
 }
 
 func (a *AuthRepository) Register(user *models.User) (*models.User, error) {
-	user, err := user.Save(a.db)
+	// パスワードをハッシュ化する
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(hashedPassword)
+
+	user, err = user.Save(a.db)
 	if err != nil {
 		return nil, err
 	}
