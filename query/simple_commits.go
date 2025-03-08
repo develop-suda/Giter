@@ -1,6 +1,9 @@
 package query
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
 type SimpleCommits struct {
 	Name   string   `json:"name"`
@@ -76,5 +79,11 @@ func ToCommits(commits *[]SimpleCommits) *[]Commits {
 			}
 		}
 	}
+	SortCommits(result)
 	return &result
+}
+
+func SortCommits(commits []Commits) *[]Commits {
+	sort.SliceStable(commits, func(i, j int) bool { return (commits)[i].CommittedDate.After((commits)[j].CommittedDate) })
+	return &commits
 }
