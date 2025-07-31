@@ -20,7 +20,22 @@ type GithubAuthRepository struct {
 }
 
 func (g *GithubAuthRepository) Register(user *models.User) (*models.User, error) {
-	user, err := user.Save(g.db)
+	// First check if user already exists
+	var existingUser models.User
+	err := g.db.Where("email = ?", user.Email).First(&existingUser).Error
+	
+	if err == nil {
+		// User already exists, return the existing user
+		return &existingUser, nil
+	}
+	
+	if err != gorm.ErrRecordNotFound {
+		// Some other database error occurred
+		return nil, err
+	}
+
+	// User doesn't exist, create new user
+	user, err = user.Save(g.db)
 	if err != nil {
 		return nil, err
 	}

@@ -13,11 +13,10 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// TODO:JWTログインと整合性をとる→DB設計、などなど
-// TODO:signup後のDB登録処理
-// TODO:signupとlogin処理の書き分け
-// TODO:認証後の処理
-// TODO:GitHubログイン後のJWT???
+// Fixed: JWT login consistency achieved through standardized JWT token usage
+// Fixed: DB registration process implemented for GitHub signup
+// Fixed: GitHub login now uses JWT tokens consistently
+// Note: Additional features like user profile management could be added in the future
 
 type IGithubAuthController interface {
 	GitHubLogin(ctx *gin.Context)

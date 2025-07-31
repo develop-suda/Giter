@@ -27,6 +27,7 @@ func validateRequiredEnvVars() {
 		"TOKEN_HOUR_LIFESPAN",
 		"GITHUB_KEY",
 		"GITHUB_SECRET",
+		"GITHUB_CALLBACK_URL",
 	}
 
 	for _, envVar := range requiredVars {

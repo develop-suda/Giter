@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"giter/initializer"
 	"giter/query"
 	"giter/services"
@@ -30,6 +29,10 @@ type RequestController struct {
 func (c *RequestController) GetCommits(ctx *gin.Context) {
 	repositories, err := c.GetRepositories(ctx)
 	if err != nil {
+		c.logger.Error().Err(err).Msg("Failed to get repositories")
+		ctx.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{
+			"error": "Failed to retrieve repositories",
+		})
 		return
 	}
 
@@ -37,12 +40,13 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 
 	for i, v := range repositories {
 		repo := *v.Name
-		fmt.Printf("Repository %d: %s\n", i, repo)
-		commit, err := c.service.GetCommits(repo, "develop-suda")
-		commits = append(commits, *commit)
+		c.logger.Debug().Int("index", i).Str("repo", repo).Msg("Processing repository")
+		commit, err := c.service.GetCommits(repo, "develop-suda") // TODO: make username configurable
 		if err != nil {
-			fmt.Println(err.Error())
+			c.logger.Error().Err(err).Str("repo", repo).Msg("Failed to get commits for repository")
+			continue // Skip this repository but continue with others
 		}
+		commits = append(commits, *commit)
 	}
 
 	result := query.ToCommits(&commits)
@@ -53,11 +57,12 @@ func (c *RequestController) GetCommits(ctx *gin.Context) {
 }
 
 func (c *RequestController) GetRepositories(ctx *gin.Context) ([]*github.Repository, error) {
-
+	// TODO: Get username from authenticated user context instead of hardcoding
 	email := "develop-suda"
 
 	repos, err := c.service.GetRepositories(email)
 	if err != nil {
+		c.logger.Error().Err(err).Str("email", email).Msg("Failed to get repositories")
 		return nil, err
 	}
 	return repos, nil

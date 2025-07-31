@@ -26,7 +26,12 @@ func main() {
 	db := infra.SetupDB()
 
 	goth.UseProviders(
-		github.New(os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"), "http://localhost:8080/auth/github/callback", "user"),
+		github.New(
+			os.Getenv("GITHUB_KEY"), 
+			os.Getenv("GITHUB_SECRET"), 
+			os.Getenv("GITHUB_CALLBACK_URL"), 
+			"user",
+		),
 	)
 
 	clients := initializer.NewClients()

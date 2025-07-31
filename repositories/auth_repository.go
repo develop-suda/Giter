@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"giter/dto"
 	"giter/initializer"
 	"giter/models"
@@ -22,6 +23,20 @@ type AuthRepository struct {
 }
 
 func (a *AuthRepository) Register(user *models.User) (*models.User, error) {
+	// Check if user already exists
+	var existingUser models.User
+	err := a.db.Where("email = ?", user.Email).First(&existingUser).Error
+	
+	if err == nil {
+		// User already exists, return error
+		return nil, fmt.Errorf("user with email %s already exists", user.Email)
+	}
+	
+	if err != gorm.ErrRecordNotFound {
+		// Some other database error occurred
+		return nil, err
+	}
+
 	// パスワードをハッシュ化する
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
