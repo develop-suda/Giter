@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,10 +28,17 @@ func GenerateToken(id uint) (string, error) {
 }
 
 func extractTokenString(ctx *gin.Context) string {
+	// First try to get token from Authorization header
 	bearToken := ctx.Request.Header.Get("Authorization")
 	strArr := strings.Split(bearToken, " ")
-	if len(strArr) == 2 {
+	if len(strArr) == 2 && strings.ToLower(strArr[0]) == "bearer" {
 		return strArr[1]
+	}
+
+	// If not found in header, try to get from cookie
+	token, err := ctx.Cookie("jwt")
+	if err == nil && token != "" {
+		return token
 	}
 
 	return ""
@@ -41,7 +48,7 @@ func parseToken(tokenString string) (*jwt.Token, error) {
 	// トークンの検証、トークンのパースを実行
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("There was an error")
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
@@ -56,15 +63,17 @@ func parseToken(tokenString string) (*jwt.Token, error) {
 // トークンが有効かどうかを検証
 func TokenValid(ctx *gin.Context) error {
 	tokenString := extractTokenString(ctx)
+	if tokenString == "" {
+		return fmt.Errorf("no token provided")
+	}
 
 	token, err := parseToken(tokenString)
-
 	if err != nil {
 		return err
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("Invalid token")
+		return fmt.Errorf("invalid token")
 	}
 
 	return nil
@@ -73,24 +82,24 @@ func TokenValid(ctx *gin.Context) error {
 // トークンからユーザーIDを取得
 func ExtractTokenId(ctx *gin.Context) (uint, error) {
 	tokenString := extractTokenString(ctx)
+	if tokenString == "" {
+		return 0, fmt.Errorf("no token provided")
+	}
 
 	token, err := parseToken(tokenString)
-
 	if err != nil {
 		return 0, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-
-	if ok && token.Valid {
-		userId, ok := claims["user_id"].(float64)
-
-		if !ok {
-			return 0, nil
-		}
-
-		return uint(userId), nil
+	if !ok || !token.Valid {
+		return 0, fmt.Errorf("invalid token claims")
 	}
 
-	return 0, nil
+	userId, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, fmt.Errorf("user_id not found in token")
+	}
+
+	return uint(userId), nil
 }

@@ -5,12 +5,12 @@ import (
 	"giter/initializer"
 	"giter/models"
 	"giter/services"
+	"giter/utils/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/markbates/goth/gothic"
 	"github.com/rs/zerolog"
-	"github.com/stretchr/objx"
 )
 
 // TODO:JWTログインと整合性をとる→DB設計、などなど
@@ -38,14 +38,22 @@ func (g *GithubAuthController) GitHubLogin(ctx *gin.Context) {
 }
 
 // GitHubCallback はGitHub認証のコールバックを処理するメソッドです。
-// 認証が成功した場合、ユーザー情報を取得し、クッキーに保存してメイン画面にリダイレクトします。
+// 認証が成功した場合、ユーザー情報を取得し、JWTトークンを生成してクッキーに保存し、メイン画面にリダイレクトします。
 // 認証に失敗した場合、エラーメッセージを返します。
 func (g *GithubAuthController) GitHubCallback(ctx *gin.Context) {
 	// ユーザー認証を完了し、ユーザー情報を取得
 	userData, err := gothic.CompleteUserAuth(ctx.Writer, ctx.Request)
 	if err != nil {
 		// 認証に失敗した場合、エラーメッセージを返す
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		g.logger.Error().Err(err).Msg("GitHub authentication failed")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "GitHub authentication failed"})
+		return
+	}
+
+	// 入力検証
+	if userData.Email == "" {
+		g.logger.Error().Msg("GitHub user has no email address")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "GitHub account must have a public email address"})
 		return
 	}
 
@@ -53,14 +61,21 @@ func (g *GithubAuthController) GitHubCallback(ctx *gin.Context) {
 	user := &models.User{Email: userData.Email, Password: "", IsGithubUser: true, CanSendEmail: false}
 	user, err = g.service.Register(user)
 	if err != nil {
+		g.logger.Error().Err(err).Str("email", userData.Email).Msg("Failed to register GitHub user")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user account"})
+		return
 	}
 
-	// ユーザー情報をクッキーに保存
-	authCookieValue := objx.New(map[string]interface{}{
-		"name":       userData.Name,
-		"avatar_url": userData.AvatarURL,
-	}).MustBase64()
-	ctx.SetCookie("auth", authCookieValue, 0, "/", "", false, true)
+	// JWTトークンを生成（通常認証と統一）
+	token, err := token.GenerateToken(user.ID)
+	if err != nil {
+		g.logger.Error().Err(err).Uint("userID", user.ID).Msg("Failed to generate JWT token for GitHub user")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate authentication token"})
+		return
+	}
+
+	// セキュアなクッキー設定でJWTトークンを保存
+	ctx.SetCookie("jwt", token, 3600, "/", "", true, true)
 
 	// メイン画面へリダイレクト
 	ctx.Redirect(http.StatusTemporaryRedirect, "/")

@@ -29,3 +29,6 @@ go.work.sum
 /tmp
 /logs/gin/*
 /logs/zerolog/*
+
+# Application binary
+giter

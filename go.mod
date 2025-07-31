@@ -53,14 +53,13 @@ require (
 
 require (
 	github.com/coder/websocket v1.8.12 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/requestid v1.0.4
 	github.com/gin-gonic/gin v1.10.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/zerolog v1.33.0
-	github.com/stretchr/objx v0.5.2
 	golang.org/x/oauth2 v0.24.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
